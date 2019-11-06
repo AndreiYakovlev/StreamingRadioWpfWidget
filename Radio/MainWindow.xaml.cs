@@ -12,13 +12,11 @@ namespace Radio
 
         private void Grid_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            DragMove();
-            e.Handled = true;
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            Close();
+            if (e.LeftButton == System.Windows.Input.MouseButtonState.Pressed)
+            {
+                DragMove();
+                e.Handled = true;
+            }
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -26,6 +24,11 @@ namespace Radio
             var desktopWorkingArea = System.Windows.SystemParameters.WorkArea;
             Left = desktopWorkingArea.Right - Width;
             Top = desktopWorkingArea.Bottom - Height;
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            Hide();
         }
     }
 }

@@ -1,59 +1,83 @@
 ﻿<Window x:Class="Radio.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:local="clr-namespace:Radio" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" Title="Radio Record"
-        Width="200" Height="auto"
-        AllowsTransparency="True" Background="Transparent"
-        FontFamily="Segoe UI" FontWeight="Normal"
-        Loaded="Window_Loaded" ResizeMode="NoResize"
-        ShowInTaskbar="False" SizeToContent="Height"
-        Topmost="True" UseLayoutRounding="True"
-        WindowStyle="None" mc:Ignorable="d">
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        Title="Radio Record" Width="250"
+        Height="auto" AllowsTransparency="True"
+        Background="Transparent" FontFamily="Segoe UI"
+        FontWeight="Normal" Loaded="Window_Loaded"
+        ResizeMode="NoResize" ShowInTaskbar="False"
+        SizeToContent="Height" Topmost="True"
+        UseLayoutRounding="True" WindowStyle="None"
+        mc:Ignorable="d">
 
     <Border Margin="8" Padding="0"
-            Background="#222" CornerRadius="16">
+            Background="#222" CornerRadius="12"
+            Opacity="0.85">
         <Border.Effect>
             <DropShadowEffect BlurRadius="8" Direction="0"
-                              Opacity="0.4" ShadowDepth="0" />
+                              Opacity="0.5" ShadowDepth="0" />
         </Border.Effect>
         <Grid>
             <StackPanel VerticalAlignment="Top">
-                <Grid MouseDown="Grid_MouseDown">
-                    <Image Width="16" Height="16"
-                           Margin="8" HorizontalAlignment="Left"
-                           VerticalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality"
-                           Source="favicon.ico" />
-                    <TextBlock Margin="24,0,0,0" Padding="8"
-                               VerticalAlignment="Center" FontSize="14"
-                               Foreground="#CCC"
-                               Text="{Binding Channel.Title}"
-                               TextAlignment="Left" />
-
-                    <Button Width="24" Height="24"
-                            Margin="8" Padding="0"
-                            HorizontalAlignment="Right" VerticalAlignment="Center"
-                            Background="{x:Null}"
-                            BorderBrush="{x:Null}"
-                            Click="Button_Click" Foreground="#933"
-                            IsTabStop="False">
-                        <Border>
-                            <materialDesign:PackIcon Width="16" Height="16"
-                                                     HorizontalAlignment="Center" VerticalAlignment="Center"
-                                                     Kind="WindowClose" />
-                        </Border>
-                    </Button>
-                </Grid>
 
                 <StackPanel Margin="8,0,8,8">
+                    <Grid>
+                        <Grid VerticalAlignment="Top" MouseDown="Grid_MouseDown">
+                            <Grid.Resources>
+                                <Style BasedOn="{StaticResource MaterialDesignRaisedButton}" TargetType="Button">
+                                    <Setter Property="Width" Value="24" />
+                                    <Setter Property="Height" Value="24" />
+                                    <Setter Property="Padding" Value="0" />
+                                    <Setter Property="Background" Value="{x:Null}" />
+                                    <Setter Property="BorderBrush" Value="{x:Null}" />
+                                </Style>
+                            </Grid.Resources>
+                            <Image Width="16" Height="16"
+                                   Margin="8" HorizontalAlignment="Left"
+                                   VerticalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality"
+                                   Source="icon.ico" />
+                            <TextBlock Margin="24,0,0,0" Padding="8"
+                                       VerticalAlignment="Center" FontSize="14"
+                                       Foreground="#CCC"
+                                       Text="{Binding Channel.Title}"
+                                       TextAlignment="Left" />
 
-                    <TextBlock VerticalAlignment="Center" FontSize="10"
-                               Foreground="#666"
-                               Text="{Binding Channel.StreamUrl, StringFormat=\{0:F\}}"
-                               TextAlignment="Left" />
+                            <StackPanel HorizontalAlignment="Right" VerticalAlignment="Center"
+                                        Orientation="Horizontal">
+                                <Button Click="Button_Click_1" Foreground="#666">
+                                    <materialDesign:PackIcon Width="16" Height="16"
+                                                             HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                             Kind="Hide" />
+                                </Button>
 
-                    <Slider HorizontalAlignment="Stretch" Maximum="100"
-                            Orientation="Horizontal"
-                            Value="{Binding Volume}" />
+                                <Button Command="{Binding CloseCommand}" Foreground="#933">
+                                    <materialDesign:PackIcon Width="16" Height="16"
+                                                             HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                             Kind="WindowClose" />
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+                        <StackPanel>
+                            <DockPanel>
+                                <Button Width="16" Height="16"
+                                        Padding="0" VerticalAlignment="Bottom"
+                                        Background="{x:Null}"
+                                        BorderBrush="{x:Null}"
+                                        Command="{Binding MuteCommand}"
+                                        DockPanel.Dock="Left" Foreground="#999"
+                                        Style="{StaticResource MaterialDesignToolButton}">
+                                    <materialDesign:PackIcon Kind="VolumeHigh" />
+                                </Button>
+                                <Slider HorizontalAlignment="Stretch" Maximum="100"
+                                        Orientation="Horizontal"
+                                        Style="{StaticResource MaterialDesignDiscreteSlider}"
+                                        Value="{Binding Volume}" />
+                            </DockPanel>
+
+                            <TextBlock FontSize="10" Foreground="#666"
+                                       Text="{Binding Channel.StreamUrl}" />
+                        </StackPanel>
+                    </Grid>
 
                     <Grid>
                         <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center"
@@ -62,7 +86,8 @@
 
                         <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center"
                                    FontSize="10" Foreground="#666"
-                                   Text="{Binding BufferLife, StringFormat=\{0:F\} сек.}" />
+                                   Text="{Binding BufferLife, StringFormat=\{0:F1\} sec.}"
+                                   ToolTip="Buffer life" />
 
                         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
                                     Orientation="Horizontal">
@@ -75,6 +100,18 @@
                             </StackPanel.Resources>
                             <Button Command="{Binding PreviousChannelCommand}">
                                 <materialDesign:PackIcon Kind="SkipPrevious" />
+                            </Button>
+
+                            <!--<Button Command="{Binding RecordCommand}">
+                                <materialDesign:PackIcon Foreground="#C33" Kind="Record" />
+                            </Button>-->
+
+                            <Button Name="pauseButton" Command="{Binding PauseCommand}">
+                                <materialDesign:PackIcon Kind="Pause" />
+                            </Button>
+
+                            <Button Name="playButton" Command="{Binding PlayCommand}">
+                                <materialDesign:PackIcon Kind="Play" />
                             </Button>
 
                             <Button Command="{Binding NextChannelCommand}">
