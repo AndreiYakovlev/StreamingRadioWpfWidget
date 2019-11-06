@@ -240,8 +240,15 @@ namespace Radio
                  new Channel("Dancecore", "http://air.radiorecord.ru:8102/dc_320"),
                  new Channel("Dubstep", "http://air.radiorecord.ru:8102/dub_320"),
                  new Channel("Trap", "http://air.radiorecord.ru:8102/trap_320"),
-                 new Channel("Deep", "http://air.radiorecord.ru:8102/deep_320")
-            };
+                 new Channel("Deep", "http://air.radiorecord.ru:8102/deep_320"),
+				 new Channel("Rock - FM", "http://nashe1.hostingradio.ru/rock-128.mp3"),
+				 new Channel("Rock - Progressive", "http://jfm1.hostingradio.ru:14536/prog.mp3"),
+				 new Channel("Rock - Metal", "http://jfm1.hostingradio.ru:14536/metal.mp3"),
+				 new Channel("Rock - 00s", "http://jfm1.hostingradio.ru:14536/rock00.mp3"),
+				 new Channel("Rock - 90s", "http://jfm1.hostingradio.ru:14536/rock90.mp3"),
+				 new Channel("Rock - 80s", "http://jfm1.hostingradio.ru:14536/rock80.mp3"),
+				 new Channel("Rock - 70s", "http://jfm1.hostingradio.ru:14536/rock70.mp3"),
+			};
 
             ChannelIndex = 0;
 
