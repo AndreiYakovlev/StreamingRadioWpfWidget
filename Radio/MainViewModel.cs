@@ -248,6 +248,8 @@ namespace Radio
 				 new Channel("Rock - 90s", "http://jfm1.hostingradio.ru:14536/rock90.mp3"),
 				 new Channel("Rock - 80s", "http://jfm1.hostingradio.ru:14536/rock80.mp3"),
 				 new Channel("Rock - 70s", "http://jfm1.hostingradio.ru:14536/rock70.mp3"),
+				 new Channel("Radio Record", "http://air2.radiorecord.ru:9003/rr_320"),
+				 new Channel("Record Russian Mix", "http://air2.radiorecord.ru:9003/rus_320"),
 			};
 
             ChannelIndex = 0;
