@@ -13,6 +13,7 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Threading;
+using MessageBox = System.Windows.MessageBox;
 
 namespace Radio
 {
@@ -84,29 +85,30 @@ namespace Radio
                 channel = value;
                 OnPropertyChanged();
 
-                if (CancellationToken != null)
+                Stop();
+
+                try
                 {
-                    CancellationToken.Cancel();
-                    networkThread.Wait();
+                    outputDevice = CreateDevice();
                 }
-                BufferLife = 0;
-                CancellationToken = new CancellationTokenSource();
-
-                outputDevice = new WaveOutEvent()
+                catch (Exception ex)
                 {
-                    Volume = 0.5f
-                };
+                    MessageBox.Show(window, ex.Message, "Не удалось создать звуковое устройство");
+                    return;
+                }
 
+                CancellationToken = new CancellationTokenSource();
                 networkThread = Task.Run(() =>
                 {
                     try
                     {
-                        IMp3FrameDecompressor decompressor = null;
                         WebRequest request = WebRequest.Create(Channel.StreamUrl);
-                        using (Stream responseStream = request.GetResponse().GetResponseStream())
+                        using (WebResponse response = request.GetResponse())
+                        using (Stream responseStream = response.GetResponseStream())
                         {
                             var buffer = new byte[1024 * 128]; // needs to be big enough to hold a decompressed frame
 
+                            IMp3FrameDecompressor decompressor = null;
                             var readFullyStream = new ReadFullyStream(responseStream);
 
                             while (!CancellationToken.IsCancellationRequested)
@@ -136,12 +138,13 @@ namespace Radio
 
                                     if (frame == null)
                                         break;
+
                                     if (decompressor == null)
                                     {
                                         decompressor = CreateFrameDecompressor(frame);
                                         bufferedWaveProvider = new BufferedWaveProvider(decompressor.OutputFormat)
                                         {
-                                            BufferDuration = TimeSpan.FromSeconds(15)
+                                            BufferDuration = TimeSpan.FromSeconds(60)
                                         };
 
                                         volumeWaveProvider = new VolumeWaveProvider16(bufferedWaveProvider)
@@ -159,11 +162,10 @@ namespace Radio
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine(ex.Message);
-                    }
-                    finally
-                    {
-                        Stop();
+                        window.Dispatcher.Invoke(() =>
+                        {
+                            MessageBox.Show(window, ex.Message, "Ошибка при воспроизведении");
+                        });
                     }
                 }, CancellationToken.Token);
             }
@@ -233,34 +235,29 @@ namespace Radio
             window = mainWindow ?? throw new ArgumentNullException(nameof(mainWindow));
 
             Channels = new List<Channel>() {
-                 new Channel("Trancemission", "http://air.radiorecord.ru:8102/tm_320"),
-                 new Channel("Russian Mix", "http://air.radiorecord.ru:8102/rus_320"),
-                 new Channel("Chill-Ou", "http://air.radiorecord.ru:8102/chil_320 "),
-                 new Channel("Club", "http://air.radiorecord.ru:8102/club_320"),
-                 new Channel("Dancecore", "http://air.radiorecord.ru:8102/dc_320"),
-                 new Channel("Dubstep", "http://air.radiorecord.ru:8102/dub_320"),
-                 new Channel("Trap", "http://air.radiorecord.ru:8102/trap_320"),
-                 new Channel("Deep", "http://air.radiorecord.ru:8102/deep_320"),
-				 new Channel("Rock - FM", "http://nashe1.hostingradio.ru/rock-128.mp3"),
-				 new Channel("Rock - Progressive", "http://jfm1.hostingradio.ru:14536/prog.mp3"),
-				 new Channel("Rock - Metal", "http://jfm1.hostingradio.ru:14536/metal.mp3"),
-				 new Channel("Rock - 00s", "http://jfm1.hostingradio.ru:14536/rock00.mp3"),
-				 new Channel("Rock - 90s", "http://jfm1.hostingradio.ru:14536/rock90.mp3"),
-				 new Channel("Rock - 80s", "http://jfm1.hostingradio.ru:14536/rock80.mp3"),
-				 new Channel("Rock - 70s", "http://jfm1.hostingradio.ru:14536/rock70.mp3"),
-				 new Channel("Radio Record", "http://air2.radiorecord.ru:9003/rr_320"),
-				 new Channel("Record Russian Mix", "http://air2.radiorecord.ru:9003/rus_320"),
-			};
-
-            ChannelIndex = 0;
+                 new Channel("Radio Record", "http://air2.radiorecord.ru:9003/rr_320"),
+                 new Channel("Radio Record - Trancemission12313", "http://air.radiorecord.ru:8102/tm_320"),
+                 new Channel("Radio Record - Russian Mix", "http://air.radiorecord.ru:8102/rus_320"),
+                 new Channel("Radio Record - Chill-Ou", "http://air.radiorecord.ru:8102/chil_320 "),
+                 new Channel("Radio Record - Club", "http://air.radiorecord.ru:8102/club_320"),
+                 new Channel("Radio Record - Dancecore", "http://air.radiorecord.ru:8102/dc_320"),
+                 new Channel("Radio Record - Dubstep", "http://air.radiorecord.ru:8102/dub_320"),
+                 new Channel("Radio Record - Trap", "http://air.radiorecord.ru:8102/trap_320"),
+                 new Channel("Radio Record - Deep", "http://air.radiorecord.ru:8102/deep_320"),
+                 new Channel("Rock FM", "http://nashe1.hostingradio.ru/rock-128.mp3"),
+                 new Channel("Rock - Progressive", "http://jfm1.hostingradio.ru:14536/prog.mp3"),
+                 new Channel("Rock - Metal", "http://jfm1.hostingradio.ru:14536/metal.mp3"),
+                 new Channel("Rock - 00s", "http://jfm1.hostingradio.ru:14536/rock00.mp3"),
+                 new Channel("Rock - 90s", "http://jfm1.hostingradio.ru:14536/rock90.mp3"),
+                 new Channel("Rock - 80s", "http://jfm1.hostingradio.ru:14536/rock80.mp3"),
+                 new Channel("Rock - 70s", "http://jfm1.hostingradio.ru:14536/rock70.mp3"),
+            };
 
             Volume = 30;
 
-            DispatcherTimer timer = new DispatcherTimer()
-            {
-                Interval = TimeSpan.FromMilliseconds(500)
-            };
-            timer.Tick += (s, e) =>
+            ChannelIndex = 0;
+
+            new DispatcherTimer(TimeSpan.FromMilliseconds(500), DispatcherPriority.Normal, (s, e) =>
             {
                 if (bufferedWaveProvider != null && outputDevice != null)
                 {
@@ -277,10 +274,34 @@ namespace Radio
                         Play();
                     }
                 }
-            };
-            timer.Start();
+            }, window.Dispatcher).Start();
 
-            notifyIcon = new NotifyIcon();
+            notifyIcon = CreateNotifyIcon();
+        }
+
+        private static IMp3FrameDecompressor CreateFrameDecompressor(Mp3Frame frame)
+        {
+            WaveFormat waveFormat = new Mp3WaveFormat(frame.SampleRate, frame.ChannelMode == ChannelMode.Mono ? 1 : 2,
+                frame.FrameLength, frame.BitRate);
+            return new AcmMp3FrameDecompressor(waveFormat);
+        }
+
+        private IWavePlayer CreateDevice()
+        {
+            if (WaveOut.DeviceCount == 0)
+            {
+                throw new Exception("Не найдено ни одно активное звуковое устройство для воспроизведения");
+            }
+
+            return new WaveOutEvent()
+            {
+                Volume = 1,
+            };
+        }
+
+        private NotifyIcon CreateNotifyIcon()
+        {
+            NotifyIcon notifyIcon = new NotifyIcon();
             notifyIcon.Text = System.Reflection.Assembly.GetEntryAssembly().GetName().Name;
             notifyIcon.DoubleClick += (s, e) => { window?.Show(); };
             notifyIcon.Icon = new Icon(System.Windows.Application.GetResourceStream(new Uri("pack://application:,,,/icon.ico")).Stream);
@@ -301,13 +322,7 @@ namespace Radio
                 }),
             };
             notifyIcon.ContextMenu = new ContextMenu(contextMenuItems);
-        }
-
-        private static IMp3FrameDecompressor CreateFrameDecompressor(Mp3Frame frame)
-        {
-            WaveFormat waveFormat = new Mp3WaveFormat(frame.SampleRate, frame.ChannelMode == ChannelMode.Mono ? 1 : 2,
-                frame.FrameLength, frame.BitRate);
-            return new AcmMp3FrameDecompressor(waveFormat);
+            return notifyIcon;
         }
 
         public void Pause()
@@ -329,14 +344,27 @@ namespace Radio
         public void Stop()
         {
             PlaybackState = StreamingPlaybackState.Stopped;
-            outputDevice.Stop();
-            outputDevice.Dispose();
-            outputDevice = null;
+
+            if (CancellationToken != null)
+            {
+                CancellationToken.Cancel();
+                networkThread?.Wait();
+            }
+
+            if (outputDevice != null)
+            {
+                outputDevice.Stop();
+                outputDevice.Dispose();
+                outputDevice = null;
+            }
+
+            BufferLife = 0;
         }
 
         public void Close()
         {
-            CancellationToken.Cancel();
+            Stop();
+
             notifyIcon.Icon.Dispose();
             notifyIcon.Dispose();
             window.Close();

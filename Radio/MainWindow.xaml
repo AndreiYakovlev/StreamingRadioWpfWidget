@@ -10,53 +10,59 @@
         UseLayoutRounding="True" WindowStyle="None"
         mc:Ignorable="d">
 
+    <Window.Resources>
+        <SolidColorBrush x:Key="Brush1" Color="#CCC" />
+    </Window.Resources>
+
     <Border Margin="8" Padding="0"
-            Background="#222" CornerRadius="12"
-            Opacity="0.85">
+            Background="#111" CornerRadius="12"
+            Opacity="0.7">
         <Border.Effect>
-            <DropShadowEffect BlurRadius="8" Direction="0"
-                              Opacity="0.5" ShadowDepth="0" />
+            <DropShadowEffect BlurRadius="8" Direction="-90"
+                              Opacity="0.5" ShadowDepth="4" />
         </Border.Effect>
         <Grid>
             <StackPanel VerticalAlignment="Top">
 
-                <StackPanel Margin="8,0,8,8">
+                <StackPanel Margin="8,8,8,8">
                     <Grid>
-                        <Grid VerticalAlignment="Top" MouseDown="Grid_MouseDown">
-                            <Grid.Resources>
-                                <Style BasedOn="{StaticResource MaterialDesignRaisedButton}" TargetType="Button">
-                                    <Setter Property="Width" Value="24" />
-                                    <Setter Property="Height" Value="24" />
-                                    <Setter Property="Padding" Value="0" />
-                                    <Setter Property="Background" Value="{x:Null}" />
-                                    <Setter Property="BorderBrush" Value="{x:Null}" />
-                                </Style>
-                            </Grid.Resources>
-                            <Image Width="16" Height="16"
-                                   Margin="8" HorizontalAlignment="Left"
-                                   VerticalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality"
-                                   Source="icon.ico" />
-                            <TextBlock Margin="24,0,0,0" Padding="8"
-                                       VerticalAlignment="Center" FontSize="14"
-                                       Foreground="#CCC"
-                                       Text="{Binding Channel.Title}"
-                                       TextAlignment="Left" />
-
+                        <DockPanel VerticalAlignment="Top">
                             <StackPanel HorizontalAlignment="Right" VerticalAlignment="Center"
-                                        Orientation="Horizontal">
-                                <Button Click="Button_Click_1" Foreground="#666">
+                                        DockPanel.Dock="Right" Orientation="Horizontal">
+                                <StackPanel.Resources>
+                                    <Style BasedOn="{StaticResource MaterialDesignRaisedButton}" TargetType="Button">
+                                        <Setter Property="Width" Value="24" />
+                                        <Setter Property="Height" Value="24" />
+                                        <Setter Property="Padding" Value="0" />
+                                        <Setter Property="Background" Value="{x:Null}" />
+                                        <Setter Property="BorderBrush" Value="{x:Null}" />
+                                    </Style>
+                                </StackPanel.Resources>
+                                <Button Click="Button_Click_1" Foreground="{DynamicResource Brush1}">
                                     <materialDesign:PackIcon Width="16" Height="16"
                                                              HorizontalAlignment="Center" VerticalAlignment="Center"
                                                              Kind="Hide" />
                                 </Button>
 
-                                <Button Command="{Binding CloseCommand}" Foreground="#933">
+                                <Button Command="{Binding CloseCommand}" Foreground="#C66">
                                     <materialDesign:PackIcon Width="16" Height="16"
                                                              HorizontalAlignment="Center" VerticalAlignment="Center"
                                                              Kind="WindowClose" />
                                 </Button>
                             </StackPanel>
-                        </Grid>
+
+                            <StackPanel Background="Transparent" MouseDown="Grid_MouseDown"
+                                        Orientation="Horizontal">
+                                <Image Width="16" Height="16"
+                                       HorizontalAlignment="Left" VerticalAlignment="Center"
+                                       RenderOptions.BitmapScalingMode="HighQuality" Source="icon.ico" />
+                                <TextBlock Padding="4" VerticalAlignment="Center"
+                                           FontSize="12"
+                                           Foreground="{DynamicResource Brush1}"
+                                           Text="{Binding Channel.Title}"
+                                           TextAlignment="Left" />
+                            </StackPanel>
+                        </DockPanel>
                         <StackPanel>
                             <DockPanel>
                                 <Button Width="16" Height="16"
@@ -64,7 +70,7 @@
                                         Background="{x:Null}"
                                         BorderBrush="{x:Null}"
                                         Command="{Binding MuteCommand}"
-                                        DockPanel.Dock="Left" Foreground="#999"
+                                        DockPanel.Dock="Left" Foreground="#CCC"
                                         Style="{StaticResource MaterialDesignToolButton}">
                                     <materialDesign:PackIcon Kind="VolumeHigh" />
                                 </Button>
@@ -74,20 +80,22 @@
                                         Value="{Binding Volume}" />
                             </DockPanel>
 
-                            <TextBlock FontSize="10" Foreground="#666"
-                                       Text="{Binding Channel.StreamUrl}" />
+                            <!--<TextBlock FontSize="10"
+                                       Foreground="{DynamicResource Brush1}"
+                                       Text="{Binding Channel.StreamUrl}" />-->
                         </StackPanel>
                     </Grid>
 
                     <Grid>
                         <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center"
-                                   FontSize="10" Foreground="#666"
+                                   FontSize="10"
+                                   Foreground="{DynamicResource Brush1}"
                                    Text="{Binding ChannelIndexStr}" />
 
                         <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center"
-                                   FontSize="10" Foreground="#666"
-                                   Text="{Binding BufferLife, StringFormat=\{0:F1\} sec.}"
-                                   ToolTip="Buffer life" />
+                                   FontSize="10"
+                                   Foreground="{DynamicResource Brush1}"
+                                   Text="{Binding BufferLife, StringFormat=\{0:F1\} sec.}" />
 
                         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
                                     Orientation="Horizontal">
@@ -96,6 +104,7 @@
                                     <Setter Property="Width" Value="24" />
                                     <Setter Property="Height" Value="24" />
                                     <Setter Property="Padding" Value="0" />
+                                    <Setter Property="Foreground" Value="{DynamicResource Brush1}" />
                                 </Style>
                             </StackPanel.Resources>
                             <Button Command="{Binding PreviousChannelCommand}">
@@ -106,7 +115,9 @@
                                 <materialDesign:PackIcon Foreground="#C33" Kind="Record" />
                             </Button>-->
 
-                            <Button Name="pauseButton" Command="{Binding PauseCommand}">
+                            <Button Name="pauseButton"
+                                    Command="{Binding PauseCommand}"
+                                    Visibility="Collapsed">
                                 <materialDesign:PackIcon Kind="Pause" />
                             </Button>
 

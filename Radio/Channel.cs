@@ -41,8 +41,8 @@ namespace Radio
 
         public Channel(string title, string streamUrl)
         {
-            Title = title ?? throw new ArgumentNullException(nameof(title));
-            StreamUrl = streamUrl ?? throw new ArgumentNullException(nameof(streamUrl));
+            Title = title?.Trim() ?? throw new ArgumentNullException(nameof(title));
+            StreamUrl = streamUrl?.Trim() ?? throw new ArgumentNullException(nameof(streamUrl));
         }
     }
 }
